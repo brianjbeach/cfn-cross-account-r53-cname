@@ -4,6 +4,11 @@
   "Description" : "Creates a resource record in Route53 hosted zone in another account.",
  
   "Parameters": {
+    "AccountNumber" : {
+      "Description" : "The AWS account in which to create the record.",
+      "Type" : "String",
+      "Default" : "968520978119"
+    },
     "HostedZoneId" : {
       "Description" : "The id of the Route53 Hosted zone in which to create the record.",
       "Type" : "String",
@@ -26,7 +31,7 @@
     "CNAME": {
       "Type": "Custom::CNAME",
       "Properties": {
-        "ServiceToken": "arn:aws:lambda:us-east-1:968520978119:function:CreateCNAME",
+        "ServiceToken": { "Fn::Join": [ ":", [ "arn", "aws", "sns:us-east-1", { "Ref": "AccountNumber" } ,"CNAME" ] ] },
         "Region": { "Ref": "AWS::Region" },
         "HostedZoneId": { "Ref" : "HostedZoneId" },
         "Name": { "Ref" : "Name" },
