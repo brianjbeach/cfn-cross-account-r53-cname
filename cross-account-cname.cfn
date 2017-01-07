@@ -1,0 +1,40 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+ 
+  "Description" : "Creates a resource record in Route53 hosted zone in another account.",
+ 
+  "Parameters": {
+    "HostedZoneId" : {
+      "Description" : "The id of the Route53 Hosted zone in which to create the record.",
+      "Type" : "String",
+      "Default" : "ZXL85AOMNFJIZ"
+    },
+    "Name" : {
+      "Description" : "The pretty name for the CNAME record (e.g. www.example.com)",
+      "Type" : "String",
+      "Default" : "www.example.com"
+    },
+    "Value" : {
+      "Description" : "The target of the CNAME record (e.g. my-loadbalancer-1234567890.us-west-2.elb.amazonaws.com)",
+      "Type" : "String",
+      "Default" : "my-loadbalancer-1234567890.us-west-2.elb.amazonaws.com"
+    }
+  },
+ 
+  "Resources" : {
+ 
+    "CNAME": {
+      "Type": "Custom::CNAME",
+      "Properties": {
+        "ServiceToken": "arn:aws:lambda:us-east-1:968520978119:function:CreateCNAME",
+        "Region": { "Ref": "AWS::Region" },
+        "HostedZoneId": { "Ref" : "HostedZoneId" },
+        "Name": { "Ref" : "Name" },
+        "Value": { "Ref" : "Value" }
+      }
+    }
+	
+  },
+ 
+  "Outputs" : {}  
+}
