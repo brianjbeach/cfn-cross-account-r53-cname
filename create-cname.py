@@ -17,13 +17,21 @@ def processCustomResource(event, context):
         source = event['ResourceProperties']['Name']
         target = event['ResourceProperties']['Value']
         
-        if type == 'Delete':
-            action = "DELETE"
+        if type == 'Update':
+            oldhostedzone = event['OldResourceProperties']['HostedZoneId']
+            oldsource = event['OldResourceProperties']['Name']
+            oldtarget = event['OldResourceProperties']['Value']
+            print "Deleting old CNAME " + oldsource + "->" + oldtarget + " in " + oldhostedzone
+            change_resource_record_sets('DELETE', oldhostedzone, oldsource, oldtarget)
+            print "Creating new CNAME " + source + "->" + target + " in " + hostedzone
+            change_resource_record_sets('UPSERT', hostedzone, source, target)
+        elif type == 'Delete':
             print "Deleting CNAME " + source + "->" + target + " in " + hostedzone
+            change_resource_record_sets('DELETE', hostedzone, source, target)
         else:
-            action = "UPSERT"
             print "Creating CNAME " + source + "->" + target + " in " + hostedzone
-        change_resource_record_sets(action, hostedzone, source, target)
+            change_resource_record_sets('UPSERT', hostedzone, source, target)
+        
         
         print "Completed successfully"
         responseStatus = 'SUCCESS'
@@ -33,7 +41,7 @@ def processCustomResource(event, context):
     except: 
         print("Error:", sys.exc_info()[0])
         responseStatus = 'FAILED'
-        responseData = {'Error': ("Unexpected error: ", sys.exc_info()[0])}
+        responseData = {}
         sendResponse(event, context, responseStatus, responseData)
 
 
